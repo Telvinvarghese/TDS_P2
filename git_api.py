@@ -218,15 +218,18 @@ def GA1_13(question):
     return "https://raw.githubusercontent.com/Telvinvarghese/Test/main/email.json"
 
 
-def GA2_3(question):
+def GA2_3(question, token):
     pattern = r"\b([\w.+-]+)@ds\.study\.iitm\.ac\.in\b"
     match = re.search(pattern, question)
-    if match:
-        email = match.group(1)+"@ds.study.iitm.ac.in"
-        print("Email ID", email)
-    else:
+
+    if not match:
         print("No email found")
-    pattern = r"\b([\w.+-]+)@ds\.study\.iitm\.ac\.in\b"
+        return "No email found"
+
+    email = match.group(1) + "@ds.study.iitm.ac.in"
+    print("Email ID:", email)
+
+    # Update index.html with the extracted email
     github_replace_text(
         token=token,
         repo="Telvinvarghese/website",
@@ -235,11 +238,18 @@ def GA2_3(question):
         replacement=email
     )
     print("Email updated in index.html")
-    trigger_github_workflow(token=token, repo="Telvinvarghese/website",
-                            workflow_file="frequent_commit.yml")  # Trigger the workflow after
+
+    # Trigger GitHub Workflow
+    response = trigger_github_workflow(token=token, repo="Telvinvarghese/website",
+                                       workflow_file="frequent_commit.yml")
+
+    if response.status_code != 204:
+        print(f"Failed to trigger workflow: {response.status_code} - {response.json()}")
+
     time.sleep(15)
-    version=randint(10, 100)
-    return str("https://telvinvarghese.github.io/website/?v="+version)
+    version = randint(10, 100)
+    
+    return f"https://telvinvarghese.github.io/website/?v={version}"
 
 
 async def GA2_6_file(file: UploadFile = File(...)):

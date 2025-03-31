@@ -334,7 +334,7 @@ def GA1_11(question, file_path=None):
         return int(sum(values))
     except Exception as e:
         print(f"Unexpected error: {e}")
-        return 0
+        return ""
 
 
 # Download and process the files in which contains three files with different encodings:

@@ -168,12 +168,36 @@ async def receive_question(question: str = Form(...), file: UploadFile = File(No
             answer = await fetch_answer(task_id=task_id, question=question, file_path=file)
         else:
             answer = await read_answer(task_id=task_id, question=question)
-    elif task_id in ['GA1.6', 'GA1.11']:
+    elif task_id in ['GA1.6']:
         func_answer = ""
         if file:
             print(file)
             func_answer = await fetch_answer(task_id=task_id, question=question, file_path=file)
-        answer = func_answer or await read_answer(task_id=task_id, question=question)
+            if func_answer == "":
+                answer = await read_answer(task_id=task_id, question=question)
+            else:
+                answer = func_answer
+        else:
+            func_answer = await fetch_answer(task_id=task_id, question=question, file_path="")
+            if func_answer == "":
+                answer = await read_answer(task_id=task_id, question=question)
+            else:
+                answer = func_answer
+    elif task_id in ['GA1.11']:
+        func_answer = ""
+        if file:
+            print(file)
+            func_answer = await fetch_answer(task_id=task_id, question=question, file_path=file)
+            if func_answer == "":
+                answer = await read_answer(task_id=task_id, question=question)
+            else:
+                answer = func_answer
+        else:
+            func_answer = await fetch_answer(task_id=task_id, question=question, file_path="")
+            if func_answer == "":
+                answer = await read_answer(task_id=task_id, question=question)
+            else:
+                answer = func_answer
     elif task_id in ['GA1.13']:
         answer = GA1_13(question)
         # answer = "https://raw.githubusercontent.com/Telvinvarghese/Test/main/email.json"

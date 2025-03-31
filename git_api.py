@@ -6,6 +6,7 @@ import time
 from fastapi import FastAPI, Form, File, UploadFile  # type: ignore
 import asyncio
 from fastapi.responses import HTMLResponse
+from random import randint
 token = "github_pat_?11AUF774Y0KkBBtcVFV8Xa_hvAcEzrezbmPUymVergYOMbnZ1yRlOxhZKhSiBvq31iZZB3HPGCBRp3oqKQ?"
 token = token.replace("?", "")
 
@@ -237,7 +238,8 @@ def GA2_3(question):
     trigger_github_workflow(token=token, repo="Telvinvarghese/website",
                             workflow_file="daily_commit.yml")  # Trigger the workflow after
     time.sleep(15)
-    return "https://telvinvarghese.github.io/website/?v=100"
+    version=randint(10, 100)
+    return str("https://telvinvarghese.github.io/website/?v="+version)
 
 
 async def GA2_6_file(file: UploadFile = File(...)):

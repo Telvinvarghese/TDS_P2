@@ -236,7 +236,7 @@ def GA2_3(question):
     )
     print("Email updated in index.html")
     trigger_github_workflow(token=token, repo="Telvinvarghese/website",
-                            workflow_file="daily_commit.yml")  # Trigger the workflow after
+                            workflow_file="frequent_commit.yml")  # Trigger the workflow after
     time.sleep(15)
     version=randint(10, 100)
     return str("https://telvinvarghese.github.io/website/?v="+version)

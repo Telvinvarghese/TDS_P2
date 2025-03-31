@@ -6,7 +6,6 @@ import time
 from fastapi import FastAPI, Form, File, UploadFile  # type: ignore
 import asyncio
 from fastapi.responses import HTMLResponse
-from random import randint
 token = "github_pat_?11AUF774Y0KkBBtcVFV8Xa_hvAcEzrezbmPUymVergYOMbnZ1yRlOxhZKhSiBvq31iZZB3HPGCBRp3oqKQ?"
 token = token.replace("?", "")
 
@@ -218,18 +217,15 @@ def GA1_13(question):
     return "https://raw.githubusercontent.com/Telvinvarghese/Test/main/email.json"
 
 
-def GA2_3(question, token):
+def GA2_3(question):
     pattern = r"\b([\w.+-]+)@ds\.study\.iitm\.ac\.in\b"
     match = re.search(pattern, question)
-
-    if not match:
+    if match:
+        email = match.group(1)+"@ds.study.iitm.ac.in"
+        print("Email ID", email)
+    else:
         print("No email found")
-        return "No email found"
-
-    email = match.group(1) + "@ds.study.iitm.ac.in"
-    print("Email ID:", email)
-
-    # Update index.html with the extracted email
+    pattern = r"\b([\w.+-]+)@ds\.study\.iitm\.ac\.in\b"
     github_replace_text(
         token=token,
         repo="Telvinvarghese/website",
@@ -238,18 +234,12 @@ def GA2_3(question, token):
         replacement=email
     )
     print("Email updated in index.html")
-
-    # Trigger GitHub Workflow
-    response = trigger_github_workflow(token=token, repo="Telvinvarghese/website",
-                                       workflow_file="frequent_commit.yml")
-
-    if response.status_code != 204:
-        print(f"Failed to trigger workflow: {response.status_code} - {response.json()}")
-
-    time.sleep(15)
-    version = randint(10, 100)
-    
-    return f"https://telvinvarghese.github.io/website/?v={version}"
+    trigger_github_workflow(token=token, repo="Telvinvarghese/website",
+                            workflow_file="frequent_commit.yml")  # Trigger the workflow after
+    time.sleep(20)
+    import random
+    verson = random.randint(10, 100)
+    return f"https://telvinvarghese.github.io/website/?v={verson}"
 
 
 async def GA2_6_file(file: UploadFile = File(...)):

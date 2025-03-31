@@ -234,9 +234,10 @@ def GA2_3(question):
         replacement=email
     )
     print("Email updated in index.html")
+    time.sleep(10)
     trigger_github_workflow(token=token, repo="Telvinvarghese/website",
                             workflow_file="frequent_commit.yml")  # Trigger the workflow after
-    time.sleep(20)
+    time.sleep(10)
     import random
     verson = random.randint(10, 100)
     return f"https://telvinvarghese.github.io/website/?v={verson}"

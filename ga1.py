@@ -174,24 +174,33 @@ def GA1_6(question, file_path=None):
         url_match = re.search(r"https?://[^\s]+", question)
         if url_match:
             source = url_match.group(0)
-            response = requests.get(source, timeout=5)
-            response.raise_for_status()
-            html_data = response.text
-        elif file_path:  # If a file is provided
-            with open(file_path, "r", encoding="utf-8") as file:
-                html_data = file.read()
-        else:  # No URL or file, extract from the question itself
-            soup = BeautifulSoup(question, "html.parser")
-            div_text = soup.find("div")
-            return div_text.get_text(strip=True) if div_text else ""
+            try:
+                response = requests.get(source, timeout=5)
+                response.raise_for_status()
+                html_data = response.text
+            except requests.RequestException as e:
+                print(f"Error fetching URL: {e}")
+                return ""
 
-        # Parse the HTML and extract hidden input
+        elif file_path:  # If a file is provided
+            try:
+                with open(file_path, "r", encoding="utf-8") as file:
+                    html_data = file.read()
+            except (FileNotFoundError, IOError) as e:
+                print(f"Error reading file: {e}")
+                return ""
+
+        else:  # No URL or file, extract from the question itself
+            html_data = question
+
+        # Parse the HTML and extract the first hidden input value
         soup = BeautifulSoup(html_data, "html.parser")
         hidden_input = soup.find("input", {"type": "hidden"})
+
         return hidden_input.get("value", "") if hidden_input else ""
 
-    except (requests.RequestException, FileNotFoundError, IOError) as e:
-        print(f"Error: {e}")
+    except Exception as e:
+        print(f"Unexpected error: {e}")
         return ""
 
 
@@ -288,18 +297,45 @@ async def GA1_10(file: UploadFile):
 # Sum of data-value attributes:
 
 
-def GA1_11(question):
-    html_data = question
-    soup = BeautifulSoup(html_data, "html.parser")
+def GA1_11(question, file_path=None):
+    try:
+        html_data = None
 
-    # Extract divs with class "foo" and data-value attribute
-    divs = soup.select('div.foo[data-value]')
+        # Check for URL in the question
+        url_match = re.search(r"https?://[^\s]+", question)
+        if url_match:
+            source = url_match.group(0)
+            try:
+                response = requests.get(source, timeout=5)
+                response.raise_for_status()
+                html_data = response.text
+            except requests.RequestException as e:
+                print(f"Error fetching URL: {e}")
+                return ""
 
-    # Convert data-value attributes to float and print them properly
-    values = [float(div['data-value']) for div in divs]
-    # print("Extracted values:", values)  # Correct debug print
+        elif file_path:  # If a file is provided
+            try:
+                with open(file_path, "r", encoding="utf-8") as file:
+                    html_data = file.read()
+            except (FileNotFoundError, IOError) as e:
+                print(f"Error reading file: {e}")
+                return ""
 
-    return int(sum(values))
+        else:  # No URL or file, extract from the question itself
+            html_data = question
+        soup = BeautifulSoup(html_data, "html.parser")
+
+        # Extract divs with class "foo" and data-value attribute
+        divs = soup.select('div.foo[data-value]')
+
+        # Convert data-value attributes to float and sum them as an integer
+        values = [float(div['data-value'])
+                  for div in divs if div['data-value'].replace('.', '', 1).isdigit()]
+        return int(sum(values))
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+        return 0
+
 
 # Download and process the files in which contains three files with different encodings:
 # data1.csv: CSV file encoded in CP-1252
